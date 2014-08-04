@@ -1,4 +1,6 @@
-﻿InputOutputBufferHandler 
+﻿Current rough Architecture:
+
+InputOutputBufferHandler 
 	BufferProvider  - (Wraps the external service)
 		IExternalService (Console)
 			
@@ -12,3 +14,16 @@ FixedDimensionsDisplayViewModel
 ConsoleDisplay : UserControl  (UI Element)
 	DataContext = InstanceOf(FixedDimensionsDisplayViewModel)
 
+Thoughts/Future
+
+Right now input is only sent to the external process on newline. This will need to change.  
+Output will need to modify the input somehow!!
+
+- Maybe make a new interface for a 'smarter' console processor?
+	- maybe allow this Processor to modify the Input buffer
+	
+
+Selection handler on the display
+	Selection
+	Should handle Ctrl+<key>  ie. ctrl+c  should close current process
+	Colors

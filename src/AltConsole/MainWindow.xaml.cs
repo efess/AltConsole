@@ -21,12 +21,16 @@ namespace AltConsole
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
-    {   
+    {
+        private HwndSource _hwndSource;
+
         public MainWindow()
         {
+            SourceInitialized += OnSourceInitialized;
             InitializeComponent();
 
             SetItUp();
+            PreviewMouseMove += OnPreviewMouseMove;
         }
 
         private void SetItUp()
@@ -44,6 +48,161 @@ namespace AltConsole
 
             this.Closing += (s, e) => externalProcess.Stop();
             externalProcess.Run();
+        }
+
+        private void CloseButtonMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            Close();
+        }
+
+        private void MaximizeButtonMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            WindowState = WindowState.Maximized;
+        }
+
+        private void ChangeViewButtonMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            WindowState = WindowState.Normal;
+        }
+
+        private void MinimizeButtonMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        private void DragableGridMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+                DragMove();
+        }
+
+        public override void OnApplyTemplate()
+        {
+            /* omitted */
+
+            if (resizeGrid != null)
+            {
+                foreach (UIElement element in resizeGrid.Children)
+                {
+                    Rectangle resizeRectangle = element as Rectangle;
+                    if (resizeRectangle != null)
+                    {
+                        resizeRectangle.PreviewMouseDown += ResizeRectangle_PreviewMouseDown;
+                        resizeRectangle.MouseMove += ResizeRectangle_MouseMove;
+                    }
+                }
+            }
+
+            base.OnApplyTemplate();
+        }
+
+        private void moveRectangle_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (Mouse.LeftButton == MouseButtonState.Pressed)
+                DragMove();
+        }
+
+        protected void OnPreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            if (Mouse.LeftButton != MouseButtonState.Pressed)
+                Cursor = Cursors.Arrow;
+        }
+        protected void ResizeRectangle_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Rectangle rectangle = sender as Rectangle;
+            switch (rectangle.Name)
+            {
+                case "top":
+                    Cursor = Cursors.SizeNS;
+                    ResizeWindow(ResizeDirection.Top);
+                    break;
+                case "bottom":
+                    Cursor = Cursors.SizeNS;
+                    ResizeWindow(ResizeDirection.Bottom);
+                    break;
+                case "left":
+                    Cursor = Cursors.SizeWE;
+                    ResizeWindow(ResizeDirection.Left);
+                    break;
+                case "right":
+                    Cursor = Cursors.SizeWE;
+                    ResizeWindow(ResizeDirection.Right);
+                    break;
+                case "topLeft":
+                    Cursor = Cursors.SizeNWSE;
+                    ResizeWindow(ResizeDirection.TopLeft);
+                    break;
+                case "topRight":
+                    Cursor = Cursors.SizeNESW;
+                    ResizeWindow(ResizeDirection.TopRight);
+                    break;
+                case "bottomLeft":
+                    Cursor = Cursors.SizeNESW;
+                    ResizeWindow(ResizeDirection.BottomLeft);
+                    break;
+                case "bottomRight":
+                    Cursor = Cursors.SizeNWSE;
+                    ResizeWindow(ResizeDirection.BottomRight);
+                    break;
+                default:
+                    break;
+            }
+        }
+        
+        private void OnSourceInitialized(object sender, EventArgs e)
+        {
+            _hwndSource = (HwndSource)PresentationSource.FromVisual(this);
+        } 
+
+        private void ResizeWindow(ResizeDirection direction)
+        {
+            Win32.SendMessage(_hwndSource.Handle, 0x112, (IntPtr)(61440 + direction), IntPtr.Zero);
+        }
+
+        private enum ResizeDirection
+        {
+            Left = 1,
+            Right = 2,
+            Top = 3,
+            TopLeft = 4,
+            TopRight = 5,
+            Bottom = 6,
+            BottomLeft = 7,
+            BottomRight = 8,
+        }
+
+        protected void ResizeRectangle_MouseMove(Object sender, MouseEventArgs e)
+        {
+            Rectangle rectangle = sender as Rectangle;
+            switch (rectangle.Name)
+            {
+                case "top":
+                    Cursor = Cursors.SizeNS;
+                    break;
+                case "bottom":
+                    Cursor = Cursors.SizeNS;
+                    break;
+                case "left":
+                    Cursor = Cursors.SizeWE;
+                    break;
+                case "right":
+                    Cursor = Cursors.SizeWE;
+                    break;
+                case "topLeft":
+                    Cursor = Cursors.SizeNWSE;
+                    break;
+                case "topRight":
+                    Cursor = Cursors.SizeNESW;
+                    break;
+                case "bottomLeft":
+                    Cursor = Cursors.SizeNESW;
+                    break;
+                case "bottomRight":
+                    Cursor = Cursors.SizeNWSE;
+                    break;
+                default:
+                    break;
+            }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)

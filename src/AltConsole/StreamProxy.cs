@@ -18,10 +18,7 @@ namespace AltConsole
 
         public override int Read()
         {
-
             return base.Read();
         }
-
-
     }
 }

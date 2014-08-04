@@ -7,6 +7,11 @@ using System.Threading.Tasks;
 
 namespace AltConsole
 {
+    public class Win32
+    {
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern IntPtr SendMessage(IntPtr hWnd, UInt32 msg, IntPtr wParam, IntPtr lParam);
+    }
     public class NonClientRegionAPI
     {
         [StructLayout(LayoutKind.Sequential)]

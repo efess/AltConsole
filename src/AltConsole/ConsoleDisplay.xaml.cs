@@ -146,6 +146,7 @@ namespace AltConsole
                 StyleSimulations = System.Windows.Media.StyleSimulations.None,
                 UnicodeString = text,
                 Fill = new SolidColorBrush(Colors.White),
+                Opacity= 1
                 //OriginX = 5,
                 //OriginY = lineNumber * LineHeight
             };
