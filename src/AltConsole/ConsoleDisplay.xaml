@@ -1,0 +1,15 @@
+﻿<UserControl x:Class="AltConsole.ConsoleDisplay"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="600" SizeChanged="UserControl_SizeChanged" Loaded="UserControl_Loaded">
+    <Grid>
+
+        <Canvas x:Name="_canvas" Focusable="True" MouseDown="textBlock1_MouseDown" Margin="0,0,17,0" Background="Black"/>
+        <ScrollBar  x:Name="_scroll" SmallChange="1" HorizontalAlignment="Right" Grid.Column="1" Minimum="0" Scroll="_scroll_changed" Template="{StaticResource mainScroll}" >
+            
+        </ScrollBar>
+    </Grid>
+</UserControl>

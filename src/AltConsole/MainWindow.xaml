@@ -1,0 +1,28 @@
+﻿<Window xmlns:AltConsole="clr-namespace:AltConsole"  x:Class="AltConsole.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="AltConsole" Height="360" Width="654"
+         
+        Loaded="Window_Loaded">
+
+
+    <Window.Resources>
+        <ResourceDictionary>
+
+        </ResourceDictionary>
+    </Window.Resources>
+    <!--<Window.Background>
+        <SolidColorBrush Opacity="0.5" Color="White"/>
+    </Window.Background>-->
+    <Grid Margin="10,36,10,10">
+        <Label Content="Binding Lines"></Label>
+        <AltConsole:ConsoleDisplay x:Name="display" 
+                               Lines="{Binding Display}" 
+                               ScrollPosition="{Binding LinePosition}"
+                               ScreenHeight="{Binding Height}"
+                               ScreenWidth="{Binding Width}"
+                               LineHeight="{Binding LineHeight}"
+                               MaximumScroll="{Binding ScrollableLines}">
+        </AltConsole:ConsoleDisplay>
+    </Grid>
+</Window>

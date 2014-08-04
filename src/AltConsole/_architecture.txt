@@ -1,0 +1,14 @@
+﻿InputOutputBufferHandler 
+	BufferProvider  - (Wraps the external service)
+		IExternalService (Console)
+			
+	InputHandler (Provides input from UI)
+		WPF Input Control
+			ConsoleDisplay Canvas?
+
+FixedDimensionsDisplayViewModel
+	InputOutputBufferHandler
+
+ConsoleDisplay : UserControl  (UI Element)
+	DataContext = InstanceOf(FixedDimensionsDisplayViewModel)
+
