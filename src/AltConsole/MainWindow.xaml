@@ -5,6 +5,7 @@
         Background="Transparent"
         WindowStyle="None"
         AllowsTransparency="True"
+        BorderThickness="1"
         Loaded="Window_Loaded">
     <Grid
         x:Name="LayoutRoot"

@@ -47,6 +47,9 @@ namespace AltConsole
             var process = new WindowsConsole();
 
             this.Closing += (s, e) => externalProcess.Stop();
+            this.Activated += (s, e) => this.BorderBrush = new SolidColorBrush(Colors.Gray) { Opacity = .1 };
+            this.Deactivated += (s, e) => this.BorderBrush = new SolidColorBrush(Colors.Gray);
+
             externalProcess.Run();
         }
 
