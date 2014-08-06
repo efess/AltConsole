@@ -27,9 +27,38 @@ namespace AltConsole
         public static readonly DependencyProperty ScreenHeightProperty = DependencyProperty.Register("ScreenHeight", typeof(int), typeof(ConsoleDisplay), new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, (d, e) => { }));
         public static readonly DependencyProperty LineHeightProperty = DependencyProperty.Register("LineHeight", typeof(int), typeof(ConsoleDisplay), new PropertyMetadata(0, (d, e) => { }));
 
+        private Point _cursorLocation;
+        private Glyphs _cursorGlyph;
+
+        private double _glyphWidth;
+        private DateTime _delay;
+
         public ConsoleDisplay()
         {
             InitializeComponent();
+            _cursorLocation = new Point(0, 0);
+            CreateCursor();
+            _canvas.Children.Add(_cursorGlyph);
+            new System.Windows.Threading.DispatcherTimer(new TimeSpan(0, 0, 0, 0, 10), System.Windows.Threading.DispatcherPriority.Input, (s, e) =>
+            {
+                if(_delay > DateTime.Now){
+                    _cursorGlyph.Opacity = 1;
+                    return;
+                }
+                    
+                int ms = DateTime.Now.Millisecond;
+                if (ms > 500)
+                {
+                    _cursorGlyph.Opacity = 0; 
+                }
+                else
+                {
+                    _cursorGlyph.Opacity = Math.Min((double)ms / 250, 1D);
+                }
+            }, this.Dispatcher).Start();
+
+            
+            _glyphWidth = new GlyphTypeface(new Uri(@"C:\WINDOWS\Fonts\CONSOLA.TTF")).AdvanceWidths[3] * 12; // picking random index.. this needs to be a monotype font anyway.
         }
         
         
@@ -49,11 +78,23 @@ namespace AltConsole
         {
             _canvas.Children.Clear();
             int i = 0;
+            int lineCount = canvasData.Count() - 1;
+            int lastLineLength = 0;
             foreach (var chars in canvasData.Reverse())
             {
+                if (i == lineCount)
+                {
+                    lastLineLength = chars.Length + 1;
+                }
                 DrawLine(chars, i++);
             }
+            _cursorLocation = new Point(lastLineLength, lineCount);
+            _delay = DateTime.Now.AddMilliseconds(500);
+            Canvas.SetTop(_cursorGlyph, _cursorLocation.Y * LineHeight);
+            Canvas.SetLeft(_cursorGlyph, _cursorLocation.X * _glyphWidth);
+            _canvas.Children.Add(_cursorGlyph);
         }
+
         //private void ScrollBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         //{
         //    var sb = sender as CustomScrollBar;
@@ -126,13 +167,6 @@ namespace AltConsole
             //((ConsoleDisplay)d).ScrollPositionChanged((int)e.NewValue);
         }      
 
-        //FontUri             = "C:\WINDOWS\Fonts\COUR.TTF"
-        //FontRenderingEmSize = "36"
-        //StyleSimulations    = "BoldSimulation"
-        //UnicodeString       = "Hello World!"
-        //Fill                = "Maroon"
-        //OriginX             = "50"
-        //OriginY             = "300"
 
         private void DrawLine(char[] lineData, int lineNumber)
         {
@@ -142,17 +176,33 @@ namespace AltConsole
             var glyph = new Glyphs()
             {
                 FontUri = new Uri(@"C:\WINDOWS\Fonts\CONSOLA.TTF"),
+                
                 FontRenderingEmSize = 12.0,
                 StyleSimulations = System.Windows.Media.StyleSimulations.None,
                 UnicodeString = text,
                 Fill = new SolidColorBrush(Colors.White),
-                Opacity= 1
+                Opacity = 1
+            };
+
+            Canvas.SetLeft(glyph, 5);
+            Canvas.SetTop(glyph, lineNumber * LineHeight);
+            
+            _canvas.Children.Add(glyph);
+        }
+
+        private void CreateCursor()
+        {
+            _cursorGlyph = new Glyphs()
+            {
+                FontUri = new Uri(@"C:\WINDOWS\Fonts\CONSOLA.TTF"),
+                FontRenderingEmSize = 12.0,
+                StyleSimulations = System.Windows.Media.StyleSimulations.None,
+                UnicodeString = "_",
+                Fill = new SolidColorBrush(Colors.White),
+                Opacity = 1
                 //OriginX = 5,
                 //OriginY = lineNumber * LineHeight
             };
-            Canvas.SetLeft(glyph, 5);
-            Canvas.SetTop(glyph, lineNumber * LineHeight);
-            _canvas.Children.Add(glyph);
         }
 
         private void _scroll_changed(object sender, System.Windows.Controls.Primitives.ScrollEventArgs e)

@@ -58,16 +58,15 @@ namespace AltConsole
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "cmd.exe",
+                    FileName = @"cmd.exe",
                     RedirectStandardInput = true,
                     RedirectStandardOutput = true,
                     RedirectStandardError= true,
                     UseShellExecute = false,
                     CreateNoWindow = true
-                    
                 }
             };
-            
+
             _consoleProcess.Exited += (s, e) => { _processClosing = true; };
             _consoleProcess.Start();
             
@@ -105,7 +104,6 @@ namespace AltConsole
 
                     lock (_publishSynchObject)
                     {
-
                         _consoleOutBuffer[_bufferOffset++] = chr;
                     }
                 }

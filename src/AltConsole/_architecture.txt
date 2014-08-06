@@ -14,7 +14,31 @@ FixedDimensionsDisplayViewModel
 ConsoleDisplay : UserControl  (UI Element)
 	DataContext = InstanceOf(FixedDimensionsDisplayViewModel)
 
-Thoughts/Future
+
+Thoughts/Future/New arch?
+
+Command = CommandInterpreter
+Command -> Switch BufferProvider/InputHandler for duration of execution
+
+cd
+dir
+pipe to other process
+
+
+Two modes - 1. Command Interpreter mode
+			2. Running Program mode
+
+ConsoleModeHandler
+		handle input/output to InputOutputBuffer
+
+-- CommandInterpreter
+		AutoComplete
+		CommandParser
+		??
+
+-- RunProgram
+		Redirect Output/Input
+		???
 
 Right now input is only sent to the external process on newline. This will need to change.  
 Output will need to modify the input somehow!!
