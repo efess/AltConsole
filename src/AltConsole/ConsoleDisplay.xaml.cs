@@ -39,7 +39,7 @@ namespace AltConsole
             _cursorLocation = new Point(0, 0);
             CreateCursor();
             _canvas.Children.Add(_cursorGlyph);
-            new System.Windows.Threading.DispatcherTimer(new TimeSpan(0, 0, 0, 0, 10), System.Windows.Threading.DispatcherPriority.Input, (s, e) =>
+            new System.Windows.Threading.DispatcherTimer(new TimeSpan(0, 0, 0, 0, 5), System.Windows.Threading.DispatcherPriority.Input, (s, e) =>
             {
                 if(_delay > DateTime.Now){
                     _cursorGlyph.Opacity = 1;
@@ -77,18 +77,18 @@ namespace AltConsole
         private void InternalUpdateOutput(IEnumerable<char[]> canvasData)
         {
             _canvas.Children.Clear();
-            int i = 0;
-            int lineCount = canvasData.Count() - 1;
+            var array = canvasData.Reverse().ToArray();
+            
             int lastLineLength = 0;
-            foreach (var chars in canvasData.Reverse())
+            for (int i = 0; i < array.Length; i++)
             {
-                if (i == lineCount)
+                if (i == array.Length - 1)
                 {
-                    lastLineLength = chars.Length + 1;
+                    lastLineLength = array[i].Length + 1;
                 }
-                DrawLine(chars, i++);
+                DrawLine(array[i], i);
             }
-            _cursorLocation = new Point(lastLineLength, lineCount);
+            _cursorLocation = new Point(lastLineLength, array.Length - 1);
             _delay = DateTime.Now.AddMilliseconds(500);
             Canvas.SetTop(_cursorGlyph, _cursorLocation.Y * LineHeight);
             Canvas.SetLeft(_cursorGlyph, _cursorLocation.X * _glyphWidth);
