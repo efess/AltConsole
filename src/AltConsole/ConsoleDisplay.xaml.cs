@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,18 +26,25 @@ namespace AltConsole
         public static readonly DependencyProperty MaximumScrollProperty = DependencyProperty.Register("MaximumScroll", typeof(int), typeof(ConsoleDisplay), new PropertyMetadata(0, new PropertyChangedCallback(OnMaximumScrollChanged)));
         public static readonly DependencyProperty ScreenWidthProperty = DependencyProperty.Register("ScreenWidth", typeof(int), typeof(ConsoleDisplay), new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, (d, e) => { }));
         public static readonly DependencyProperty ScreenHeightProperty = DependencyProperty.Register("ScreenHeight", typeof(int), typeof(ConsoleDisplay), new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, (d, e) => { }));
-        public static readonly DependencyProperty LineHeightProperty = DependencyProperty.Register("LineHeight", typeof(int), typeof(ConsoleDisplay), new PropertyMetadata(0, (d, e) => { }));
+        public static readonly DependencyProperty CharacterDimensionsProperty = DependencyProperty.Register("CharacterDimensions", typeof(SizeF), typeof(ConsoleDisplay), new FrameworkPropertyMetadata(SizeF.Empty,FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, (d, e) => { }));
+        public static readonly DependencyProperty FontProperty = DependencyProperty.Register("Font", typeof(string), typeof(ConsoleDisplay), new PropertyMetadata(string.Empty, new PropertyChangedCallback(OnFontChanged)));
 
-        private Point _cursorLocation;
+        private System.Windows.Point _cursorLocation;
+        private SizeF _glyphDimensions;
         private Glyphs _cursorGlyph;
 
-        private double _glyphWidth;
+        private string _fontFace;
+        private int _fontSize;
+
         private DateTime _delay;
 
         public ConsoleDisplay()
         {
             InitializeComponent();
-            _cursorLocation = new Point(0, 0);
+            _fontSize = 12; // will be configurable someday.
+            _fontFace = @"C:\WINDOWS\Fonts\CONSOLA.TTF";
+            
+            _cursorLocation = new System.Windows.Point(0, 0);
             CreateCursor();
             _canvas.Children.Add(_cursorGlyph);
             new System.Windows.Threading.DispatcherTimer(new TimeSpan(0, 0, 0, 0, 5), System.Windows.Threading.DispatcherPriority.Input, (s, e) =>
@@ -56,23 +64,19 @@ namespace AltConsole
                     _cursorGlyph.Opacity = Math.Min((double)ms / 250, 1D);
                 }
             }, this.Dispatcher).Start();
-
-            
-            _glyphWidth = new GlyphTypeface(new Uri(@"C:\WINDOWS\Fonts\CONSOLA.TTF")).AdvanceWidths[3] * 12; // picking random index.. this needs to be a monotype font anyway.
         }
         
-        
-        public int ViewableLinesCount
-        {
-            get
-            {
-                if (_canvas.ActualHeight > 0)
-                {
-                    return (int)Math.Ceiling((decimal)_canvas.ActualHeight / (decimal)LineHeight);
-                }
-                return 0;
-            }
-        }
+        //public int ViewableLinesCount
+        //{
+        //    get
+        //    {
+        //        if (_canvas.ActualHeight > 0)
+        //        {
+        //            return (int)Math.Ceiling((decimal)_canvas.ActualHeight / (decimal)LineHeight);
+        //        }
+        //        return 0;
+        //    }
+        //}
         
         private void InternalUpdateOutput(IEnumerable<char[]> canvasData)
         {
@@ -88,10 +92,10 @@ namespace AltConsole
                 }
                 DrawLine(array[i], i);
             }
-            _cursorLocation = new Point(lastLineLength, array.Length - 1);
+            _cursorLocation = new System.Windows.Point(lastLineLength, lineCount);
             _delay = DateTime.Now.AddMilliseconds(500);
-            Canvas.SetTop(_cursorGlyph, _cursorLocation.Y * LineHeight);
-            Canvas.SetLeft(_cursorGlyph, _cursorLocation.X * _glyphWidth);
+            Canvas.SetTop(_cursorGlyph, _cursorLocation.Y * _glyphDimensions.Height);
+            Canvas.SetLeft(_cursorGlyph, _cursorLocation.X * _glyphDimensions.Width);
             _canvas.Children.Add(_cursorGlyph);
         }
 
@@ -103,6 +107,18 @@ namespace AltConsole
         private void _scroll_Scroll(object sender, System.Windows.Controls.Primitives.ScrollEventArgs e)
         {
             //_displayHandler.SetLinePosition((int)e.NewValue);
+        }
+
+        private void SetFont(string newFont)
+        {
+            if (_fontFace != newFont)
+                return;
+            _fontFace = newFont;
+            var typeFace = new GlyphTypeface(new Uri(newFont)); // picking random index.. this needs to be a monotype font anyway.
+            _glyphDimensions = new SizeF(
+                (float)(typeFace.AdvanceWidths[3] * _fontSize),
+                (float)(typeFace.AdvanceHeights[3] * _fontSize));
+            CharacterDimensions = _glyphDimensions;
         }
 
         private void textBlock1_MouseDown(object sender, MouseButtonEventArgs e)
@@ -144,10 +160,10 @@ namespace AltConsole
             set { SetValue(ScreenHeightProperty, value); }
             get { return (int)GetValue(ScreenHeightProperty); }
         }
-        public int LineHeight
+        public SizeF CharacterDimensions
         {
-            set { SetValue(LineHeightProperty, value); }
-            get { return (int)GetValue(LineHeightProperty); }
+            set { SetValue(CharacterDimensionsProperty, value); }
+            get { return (SizeF)GetValue(CharacterDimensionsProperty); }
         }
         public static void OnMaximumScrollChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -156,6 +172,10 @@ namespace AltConsole
             ((ConsoleDisplay)d)._scroll.IsEnabled = value > 0;
             ((ConsoleDisplay)d)._scroll.Maximum = value;
             
+        }
+        public static void OnFontChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((ConsoleDisplay)d).SetFont((string)e.NewValue);
         }
         public static void OnLinesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -175,7 +195,7 @@ namespace AltConsole
                 return;
             var glyph = new Glyphs()
             {
-                FontUri = new Uri(@"C:\WINDOWS\Fonts\CONSOLA.TTF"),
+                FontUri = new Uri(_fontFace),
                 
                 FontRenderingEmSize = 12.0,
                 StyleSimulations = System.Windows.Media.StyleSimulations.None,
@@ -185,7 +205,7 @@ namespace AltConsole
             };
 
             Canvas.SetLeft(glyph, 5);
-            Canvas.SetTop(glyph, lineNumber * LineHeight);
+            Canvas.SetTop(glyph, lineNumber * _glyphDimensions.Height);
             
             _canvas.Children.Add(glyph);
         }
@@ -194,7 +214,7 @@ namespace AltConsole
         {
             _cursorGlyph = new Glyphs()
             {
-                FontUri = new Uri(@"C:\WINDOWS\Fonts\CONSOLA.TTF"),
+                FontUri = new Uri(_fontFace),
                 FontRenderingEmSize = 12.0,
                 StyleSimulations = System.Windows.Media.StyleSimulations.None,
                 UnicodeString = "_",
@@ -210,7 +230,7 @@ namespace AltConsole
             ScrollPosition = (int)e.NewValue;
         }
 
-        private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
+        private void Canvas_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             if (e.NewSize.Height != e.PreviousSize.Height)
             {
@@ -227,6 +247,7 @@ namespace AltConsole
             _scroll.IsEnabled = false;
             ScreenHeight = (int)this.ActualHeight;
             ScreenWidth = (int)this.ActualWidth;
+            SetFont(_fontFace);
         }
     }
 }

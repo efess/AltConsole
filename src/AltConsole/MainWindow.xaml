@@ -16,7 +16,7 @@
                                ScrollPosition="{Binding LinePosition}"
                                ScreenHeight="{Binding Height}"
                                ScreenWidth="{Binding Width}"
-                               LineHeight="{Binding LineHeight}"
+                               CharacterDimensions="{Binding CharacterSize}"
                                MaximumScroll="{Binding ScrollableLines}">
             </AltConsole:ConsoleDisplay>
         </Grid>

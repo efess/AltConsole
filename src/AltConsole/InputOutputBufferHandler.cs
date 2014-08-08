@@ -12,6 +12,7 @@ namespace AltConsole
         public event ConsoleBufferUpdate OutputBufferUpdate;
         public event EventHandler<InputLineEventArgs> NewLine;
         public event EventHandler InputUpdate;
+        public int CursorPosition {get; private set;}
         public string CurrentInput { get; private set; }
         public int CurrentBufferLineCount { get { return _outputBuffer.Count(); } }
 
@@ -24,9 +25,10 @@ namespace AltConsole
         private lineEndingChecker _lineEndingCheck;
         private Action<char[]> _addInput;
 
-        public InputOutputBufferHandler(BufferProvider bufferProvider, IInputHandler inputHandler)
+        public InputOutputBufferHandler(BufferProvider bufferProvider, InputHandler inputHandler)
         {
-            inputHandler.Input += (s, e) => ProcessInput(e.InputCharacter);
+            inputHandler.InputChanged += (s, e) => ProcessInput(e.Input, e.CursorPosition);
+            inputHandler.Command += (s, e) => OnNewLine(e.InputLine);
             bufferProvider.ProcessOut += (data) => AddOutput(data);
             _addInput = new Action<char[]>((chr) => bufferProvider.ProcessIn(chr));
 
@@ -38,25 +40,10 @@ namespace AltConsole
                 : (lineEndingChecker)LineEndingTwoChars;
         }
 
-        private void ProcessInput(char chr)
+        private void ProcessInput(string currentInput, int cursorPosition)
         {
-            if (chr == 13)
-            {
-                CurrentInput = CurrentInput + Environment.NewLine;
-                _addInput(CurrentInput.ToCharArray());
-                OnNewLine(CurrentInput);
-                CurrentInput = string.Empty;
-            }
-            else if(chr == '\b')
-            {
-                if (CurrentInput.Length == 0)
-                    return;
-                CurrentInput = CurrentInput.Substring(0, CurrentInput.Length - 1);
-            }
-            else
-            {
-                CurrentInput += chr;
-            }
+            CurrentInput = currentInput;
+            CursorPosition = cursorPosition;
             OnInputUpdate();
         }
 

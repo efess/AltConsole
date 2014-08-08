@@ -65,11 +65,15 @@
     <Compile Include="ConsoleDisplay.xaml.cs">
       <DependentUpon>ConsoleDisplay.xaml</DependentUpon>
     </Compile>
+    <Compile Include="InputHandler.cs" />
+    <Compile Include="InputHistory.cs" />
+    <Compile Include="InputKeyEventArgs.cs" />
     <Compile Include="Interfaces\IBufferDisplayHandler.cs" />
-    <Compile Include="Interfaces\IInputHandler.cs" />
+    <Compile Include="Interfaces\IInputProvider.cs" />
     <Compile Include="InputEventArgs.cs" />
     <Compile Include="InputLineEventArgs.cs" />
     <Compile Include="InputOutputBufferHandler.cs" />
+    <Compile Include="KeyDown.cs" />
     <Compile Include="OutputHandler.cs" />
     <Compile Include="Interfaces\IExternalProcess.cs" />
     <Compile Include="Interfaces\INativeConsoleInterface.cs" />
