@@ -37,7 +37,7 @@ namespace AltConsole
         {
             // Set the external process 
             IExternalProcess externalProcess = new WindowsConsole();
-            var inputHandler = new WpfControlInput(display);
+            var inputHandler = new InputHandler(new WpfControlInput(display));
             var outputHandler = new BufferProvider();
             outputHandler.SetExternalProcess(externalProcess);
             var inputOutputHandler = new InputOutputBufferHandler(outputHandler, inputHandler);

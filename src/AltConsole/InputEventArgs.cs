@@ -9,11 +9,13 @@ namespace AltConsole
     public class InputEventArgs
     {
         // Maybe change this to something more intelligent at some point.
-        public char InputCharacter { get; private set; }
+        public string Input { get; private set; }
+        public int CursorPosition { get; private set; }
 
-        public InputEventArgs(char inputCharacter)
+        public InputEventArgs(string input, int position)
         {
-            InputCharacter = inputCharacter;
+            Input = input;
+            CursorPosition = position;
         }
     }
 }

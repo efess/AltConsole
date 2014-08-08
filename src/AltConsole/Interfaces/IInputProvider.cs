@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace AltConsole.Interfaces
 {
-    public interface IInputHandler
+    public interface IInputProvider
     {
-        event EventHandler<InputEventArgs> Input;
+        event EventHandler<InputKeyEventArgs> Input;
     }
 }
