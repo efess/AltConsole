@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -26,6 +26,7 @@ namespace AltConsole.ViewModel
         private int _scrollableLines;
         private int _screenWidth;
         private int _screenHeight;
+        private int _caretPosition;
         
         public int BufferLineCount { get { return _displayBuffer.Length; } }
 
@@ -40,6 +41,13 @@ namespace AltConsole.ViewModel
         // Number of lines that are scrollable
         public int ScrollableLines { get { return _scrollableLines; } set { _scrollableLines = value; OnPropertyChanged("ScrollableLines"); } }
         public IEnumerable<char[]> Display { get { return _display; } set { _display = value; OnPropertyChanged("Display"); } }
+        public int CaretPosition { get { return _caretPosition; } set {
+            if (_caretPosition != value)
+            {
+                _caretPosition = value;
+                OnPropertyChanged("CaretPosition");
+            }
+        } }
         public int LinePosition { 
             get { return _linePosition; } 
             set { 
@@ -102,6 +110,7 @@ namespace AltConsole.ViewModel
                     displayBuffer.Add(thisLine);
                 }
 
+                CaretPosition = _bufferHandler.CursorPosition;
                 // Todo: do this smarter......
                 //int lineWrapCount = (currentBuffer[i].Length + 1 / Cols);
                 //if (currentBuffer[i].Length > Cols)

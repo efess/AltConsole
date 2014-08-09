@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -28,6 +28,7 @@ namespace AltConsole
         public static readonly DependencyProperty ScreenHeightProperty = DependencyProperty.Register("ScreenHeight", typeof(int), typeof(ConsoleDisplay), new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, (d, e) => { }));
         public static readonly DependencyProperty CharacterDimensionsProperty = DependencyProperty.Register("CharacterDimensions", typeof(SizeF), typeof(ConsoleDisplay), new FrameworkPropertyMetadata(SizeF.Empty,FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, (d, e) => { }));
         public static readonly DependencyProperty FontProperty = DependencyProperty.Register("Font", typeof(string), typeof(ConsoleDisplay), new PropertyMetadata(string.Empty, new PropertyChangedCallback(OnFontChanged)));
+        public static readonly DependencyProperty CaretPositionProperty = DependencyProperty.Register("CaretPosition", typeof(int), typeof(ConsoleDisplay), new PropertyMetadata(0, (d, e) => { }));
 
         private System.Windows.Point _cursorLocation;
         private SizeF _glyphDimensions;
@@ -92,7 +93,7 @@ namespace AltConsole
                 }
                 DrawLine(array[i], i);
             }
-            _cursorLocation = new System.Windows.Point(lastLineLength, array.Length - 1);
+            _cursorLocation = new System.Windows.Point(lastLineLength + CaretPosition, array.Length - 1);
             _delay = DateTime.Now.AddMilliseconds(500);
             Canvas.SetTop(_cursorGlyph, _cursorLocation.Y * _glyphDimensions.Height);
             Canvas.SetLeft(_cursorGlyph, _cursorLocation.X * _glyphDimensions.Width);
@@ -137,6 +138,12 @@ namespace AltConsole
             get { return (IEnumerable<char[]>)GetValue(LinesProperty); }
          
         }
+        public int CaretPosition
+        {
+            set { SetValue(CaretPositionProperty, value); }
+            get { return (int)GetValue(CaretPositionProperty); }
+        }
+
         public int ScrollPosition
         {
             set { SetValue(ScrollPositionProperty, value); }

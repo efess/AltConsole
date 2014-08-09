@@ -22,6 +22,7 @@ namespace AltConsole
         {
             if(provider == null)
                 throw new ArgumentNullException("provider");
+            _currentInput = string.Empty;
             provider.Input += (s,e) => { OnInputKey(e.InputKey);};
             
             _inputHistory = new InputHistory();
@@ -42,19 +43,34 @@ namespace AltConsole
             }
             else if (inputKey.Key == Key.Back)
             {
-                if (_currentInput.Length == 0 || _position == 0)
+                if (_currentInput.Length == 0 || _position <= -_currentInput.Length)
                     return;
-                _position--;
-                _currentInput = _currentInput.Remove(_position, 1);
+                _currentInput = _currentInput.Remove(_currentInput.Length + _position-1, 1);
+            }
+            else if (inputKey.Key == Key.Home)
+            {
+                _position = -_currentInput.Length;
+            }
+            else if (inputKey.Key == Key.End)
+            {
+                _position = 0;
+            }
+            else if (inputKey.Key == Key.Delete)
+            {
+                if (_position < 0)
+                {
+                    _currentInput = _currentInput.Remove(_currentInput.Length + _position, 1);
+                    _position++;
+                }
             }
             else if (inputKey.Key == Key.Left)
             {
-                if (_position > 0)
+                if (_position > (1 - (_currentInput.Length + 1)))
                     _position--;
             }
             else if (inputKey.Key == Key.Right)
             {
-                if (_position < _currentInput.Length-1)
+                if (_position < 0)
                     _position++;
             }
             else if (inputKey.Key == Key.Up)
@@ -74,7 +90,7 @@ namespace AltConsole
                 {
                     _currentHash = next.Value.Key;
                     _currentInput = next.Value.Value;
-                    _position = _currentInput.Length;
+                    _position = 0;
                 }
                 else
                 {
@@ -87,8 +103,15 @@ namespace AltConsole
             else if (inputKey.Character != '\0')
             {
                 // try get Character
-                _currentInput += inputKey.Character;
-                _position++;
+                if (_position == 0)
+                {
+                    _currentInput += inputKey.Character;
+                }
+                else
+                {
+                    _currentInput = _currentInput.Insert(_currentInput.Length + _position, inputKey.Character.ToString());
+                    //_position++;
+                }
             }
             else
             {

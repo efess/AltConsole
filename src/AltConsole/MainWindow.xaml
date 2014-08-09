@@ -1,4 +1,4 @@
-﻿<Window xmlns:AltConsole="clr-namespace:AltConsole"  x:Class="AltConsole.MainWindow"
+<Window xmlns:AltConsole="clr-namespace:AltConsole"  x:Class="AltConsole.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="AltConsole" Height="360" Width="654"
@@ -16,6 +16,7 @@
                                ScrollPosition="{Binding LinePosition}"
                                ScreenHeight="{Binding Height}"
                                ScreenWidth="{Binding Width}"
+                               CaretPosition="{Binding CaretPosition}"
                                CharacterDimensions="{Binding CharacterSize}"
                                MaximumScroll="{Binding ScrollableLines}">
             </AltConsole:ConsoleDisplay>
