@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,8 +14,9 @@ namespace AltConsole
             _history = new List<KeyValuePair<Guid, string>>();
         }
 
-        public KeyValuePair<Guid, string> AddPriinevoius(string input)
+        public KeyValuePair<Guid, string> AddPrevious(string input)
         {
+            input = input.Replace(Environment.NewLine, "");
             if(_history.Count > 0 && _history[_history.Count - 1].Value == input)
                 return _history[_history.Count - 1];
 
@@ -50,6 +51,7 @@ namespace AltConsole
 
         public KeyValuePair<Guid, string>? SearchPrevious(string currentInput, Guid hash)
         {
+            currentInput = currentInput.Replace(Environment.NewLine, "");
             bool hashFound = hash == Guid.Empty;
             for (int i = _history.Count - 1; i > 0; i--)
             {

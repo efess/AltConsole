@@ -1,4 +1,4 @@
-﻿using AltConsole.Interfaces;
+using AltConsole.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,9 +32,10 @@ namespace AltConsole
             char? chr;
             if (inputKey.Key == Key.Return || inputKey.Key == Key.Enter)
             {
+                _currentHash = Guid.Empty;
                 _currentInput = _currentInput + Environment.NewLine;
                 OnCommand(_currentInput);
-                
+                _inputHistory.AddPrevious(_currentInput);
                 _currentInput = string.Empty;
                 _position = 0;
                 OnInputChanged(_currentInput, _position);
@@ -56,12 +57,38 @@ namespace AltConsole
                 if (_position < _currentInput.Length-1)
                     _position++;
             }
+            else if (inputKey.Key == Key.Up)
+            {
+                var prev = _inputHistory.GetPrevious(_currentHash);
+                if (prev != null)
+                {
+                    _currentHash = prev.Value.Key;
+                    _currentInput = prev.Value.Value;
+                    _position = _currentInput.Length;
+                }
+            }
+            else if (inputKey.Key == Key.Down)
+            {
+                var next = _inputHistory.GetNext(_currentHash);
+                if (next != null)
+                {
+                    _currentHash = next.Value.Key;
+                    _currentInput = next.Value.Value;
+                    _position = _currentInput.Length;
+                }
+                else
+                {
+
+                    _currentHash = Guid.Empty;
+                    _currentInput = "";
+                    _position = 0;
+                }
+            }
             else if (inputKey.Character != '\0')
             {
                 // try get Character
                 _currentInput += inputKey.Character;
                 _position++;
-                
             }
             else
             {
