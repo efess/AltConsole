@@ -1,4 +1,4 @@
-﻿using AltConsole.Interfaces;
+using AltConsole.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,6 +63,7 @@ namespace AltConsole
             {
                 evnt(this, new InputLineEventArgs(newLine));
             }
+            _addInput(newLine.ToCharArray());
         }
 
         public virtual void AddOutput(char[] line)

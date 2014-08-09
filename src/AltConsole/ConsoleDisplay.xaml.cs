@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -92,7 +92,7 @@ namespace AltConsole
                 }
                 DrawLine(array[i], i);
             }
-            _cursorLocation = new System.Windows.Point(lastLineLength, lineCount);
+            _cursorLocation = new System.Windows.Point(lastLineLength, array.Length - 1);
             _delay = DateTime.Now.AddMilliseconds(500);
             Canvas.SetTop(_cursorGlyph, _cursorLocation.Y * _glyphDimensions.Height);
             Canvas.SetLeft(_cursorGlyph, _cursorLocation.X * _glyphDimensions.Width);

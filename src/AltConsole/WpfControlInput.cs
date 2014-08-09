@@ -20,6 +20,39 @@ namespace AltConsole
             wpfControl.TextInput += wpfControl_TextInput;
         }
 
+        private char? ToUnicode(Key keyDown, bool shift, bool alt)
+        {
+            char?  newChar = null;
+
+            int virtualKey = KeyInterop.VirtualKeyFromKey(keyDown);
+
+            uint scanCode = Win32Input.MapVirtualKey((uint)virtualKey, Win32Input.MapType.MAPVK_VK_TO_VSC);
+            var buf = new StringBuilder(256);
+            var keyboardState = new byte[256];
+            //Win32Input.GetKeyboardState(keyboardState);
+            if (shift)
+                keyboardState[16] = 0xff;//(int)Keys.ShiftKey
+            if (alt)
+            {
+                keyboardState[17] = 0xff;//(int)Keys.ControlKey
+                keyboardState[18] = 0xff;//(int)Keys.Menu]
+            }
+            var result = Win32Input.ToUnicode((uint)virtualKey, scanCode, keyboardState, buf, 256, 0);
+            switch (result)
+            {
+                case -1:
+                    break;
+                case 0:
+                    break;
+                case 1:
+                        newChar = buf[0];
+                    break;
+                default:
+                        newChar = buf[0];
+                        break;
+            }
+            return newChar;
+        }
         void wpfControl_TextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
         {
             //var lol = e.Text.ToCharArray();
@@ -40,13 +73,13 @@ namespace AltConsole
         {
             var keyEvent = new KeyDown
             {
+                Character = ToUnicode(e.Key, Keyboard.Modifiers.HasFlag(ModifierKeys.Shift), Keyboard.Modifiers.HasFlag(ModifierKeys.Alt)) ?? '\0',
                 Key = e.Key,
                 IsAlt = Keyboard.Modifiers.HasFlag(ModifierKeys.Alt),
                 IsShift = Keyboard.Modifiers.HasFlag(ModifierKeys.Shift),
                 IsCtrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control),
                 IsWindows = Keyboard.Modifiers.HasFlag(ModifierKeys.Windows)
             };
-
             var evnt = Input;
             if (evnt != null)
             {

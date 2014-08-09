@@ -1,4 +1,4 @@
-﻿using AltConsole.Interfaces;
+using AltConsole.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,14 +56,12 @@ namespace AltConsole
                 if (_position < _currentInput.Length-1)
                     _position++;
             }
-            else if ((chr = keyToChar(inputKey.Key, inputKey.IsShift)) != null)
+            else if (inputKey.Character != '\0')
             {
-                if (chr != null)
-                {
-                    // try get Character
-                    _currentInput += chr;
-                    _position++;
-                }
+                // try get Character
+                _currentInput += inputKey.Character;
+                _position++;
+                
             }
             else
             {
@@ -92,8 +90,69 @@ namespace AltConsole
 
         private char? keyToChar(Key someKey, bool isShift)
         {
+            char? newChar = alphaKeyToChar(someKey, isShift);
+            if (newChar == null)
+                newChar = specialKeyToChar(someKey, isShift);
+            return newChar;
+        }
+
+        private char? specialKeyToChar(Key someKey, bool isShift)
+        {
+            switch (someKey)
+            { 
+                case Key.Space:
+                    return ' ';
+                case Key.D0:
+                    return isShift ? ')' : '0';
+                case Key.D1:
+                    return isShift ? '!' : '1';
+                case Key.D2:
+                    return isShift ? '@' : '2';
+                case Key.D3:
+                    return isShift ? '#' : '3';
+                case Key.D4:
+                    return isShift ? '$' : '4';
+                case Key.D5:
+                    return isShift ? '%' : '5';
+                case Key.D6:
+                    return isShift ? '^' : '6';
+                case Key.D7:
+                    return isShift ? '&' : '7';
+                case Key.D8:
+                    return isShift ? '*' : '8';
+                case Key.D9:
+                    return isShift ? '(' : '9';
+                case Key.OemMinus:
+                    return isShift ? '_' : '-';
+                case Key.OemPlus:
+                    return isShift ? '+' : '=';
+                case Key.OemOpenBrackets:
+                    return isShift ? '{' : '[';
+                case Key.OemCloseBrackets:
+                    return isShift ? '}' : ']';
+                case Key.OemSemicolon:
+                    return isShift ? ':' : ';';
+                case Key.OemQuotes:
+                    return isShift ? '\'' : '\"';
+                case Key.OemBackslash:
+                    return isShift ? '|' : '\\';
+                case Key.OemComma:
+                    return isShift ? '<' : ',';
+                case Key.OemPeriod:
+                    return isShift ? '>' : '.';
+                case Key.OemQuestion:
+                    return isShift ? '?' : '/';
+                case Key.OemTilde:
+                    return isShift ? '~' : '`';
+                default:
+                    return null;
+            }
+        }
+
+        private char? alphaKeyToChar(Key someKey, bool isShift)
+        {
             char? newChar = null;
-            switch(someKey)
+            switch (someKey)
             {
                 case Key.A:
                     newChar = 'a';
@@ -174,9 +233,9 @@ namespace AltConsole
                     newChar = 'z';
                     break;
             }
-            if(newChar != null && isShift)
+            if (newChar != null && isShift)
             {
-                newChar = (char)((int)newChar + 26);
+                newChar = (char)((int)newChar - 32);
             }
             return newChar;
         }

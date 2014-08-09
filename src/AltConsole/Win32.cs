@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -12,6 +12,32 @@ namespace AltConsole
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern IntPtr SendMessage(IntPtr hWnd, UInt32 msg, IntPtr wParam, IntPtr lParam);
 
+    }
+
+    public static class Win32Input
+    {
+        [DllImport("user32.dll")]
+        public static extern int ToAscii(uint uVirtKey, uint uScanCode,
+                                        byte[] lpKeyState,
+                                        [Out] StringBuilder lpChar,
+                                        uint uFlags);
+        [DllImport("user32.dll")]
+        public static extern int ToUnicode(uint virtualKeyCode, uint scanCode,
+                                            byte[] keyboardState,
+                                            [Out, MarshalAs(UnmanagedType.LPWStr, SizeConst = 64)]
+                                            StringBuilder receivingBuffer,
+                                            int bufferSize, uint flags);
+        public enum MapType : uint
+        {
+            MAPVK_VK_TO_VSC = 0x0,
+            MAPVK_VSC_TO_VK = 0x1,
+            MAPVK_VK_TO_CHAR = 0x2,
+            MAPVK_VSC_TO_VK_EX = 0x3,
+        }
+        [DllImport("user32.dll")]
+        public static extern bool GetKeyboardState(byte[] lpKeyState);
+        [DllImport("user32.dll")]
+        public static extern uint MapVirtualKey(uint uCode, MapType uMapType);
     }
 
     public static class Win32Process

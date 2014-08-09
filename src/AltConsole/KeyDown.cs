@@ -8,6 +8,7 @@ namespace AltConsole
 {
     public struct KeyDown
     {
+        public char Character;
         public System.Windows.Input.Key Key;
         public bool IsCtrl;
         public bool IsShift;
